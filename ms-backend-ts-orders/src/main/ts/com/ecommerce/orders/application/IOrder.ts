@@ -5,4 +5,6 @@ export interface IOrder {
     idUsuario: number,
     idProducto: number
   ): Promise<OrderDomain | null>;
+
+  createOrder(data: any): Promise<OrderDomain>;
 }
