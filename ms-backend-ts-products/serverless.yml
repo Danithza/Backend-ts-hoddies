@@ -1,0 +1,25 @@
+service: ms-products
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  stage: dev
+  region: us-east-1
+
+functions:
+  app:
+    handler: dist/main/com/ecommerce/products/lambda/handler.handler
+    events:
+      - http:
+          path: products/{proxy+}
+          method: any
+      - http:
+          path: categories/{proxy+}
+          method: any
+
+plugins:
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    httpPort: 3005
