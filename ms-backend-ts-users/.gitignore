@@ -43,3 +43,5 @@ docker-compose.override.yml
 
 # Archivos de TypeScript (si aplica)
 *.tsbuildinfo
+
+.serverless/

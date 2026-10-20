@@ -3,11 +3,16 @@ import { UserDomain, UpdateUserDomain } from "./DTO/UserDomain";
 import { IUserRepository } from "../infraestructure/Repository/IUserRepository";
 import * as bcrypt from "bcrypt";
 import * as jwt from "jsonwebtoken";
+import "dotenv/config";
 
-const SECRET = "SUPER_SECRET";
+const SECRET = process.env.JWT_SECRET;
+
+if (!SECRET) {
+  throw new Error("JWT_SECRET no está configurado en las variables de entorno");
+}
 
 export class UserImpl implements IUser {
-   constructor(private repo: IUserRepository) {}
+  constructor(private repo: IUserRepository) {}
 
   async register(user: UserDomain): Promise<UserDomain> {
     user.password = await bcrypt.hash(user.password, 10);
@@ -16,32 +21,38 @@ export class UserImpl implements IUser {
 
   async login(correo: string, password: string): Promise<string> {
     const user = await this.repo.findByCorreo(correo);
-    if (!user) throw new Error("Usuario no encontrado");
+    if (!user) {
+      throw new Error("Usuario no encontrado");
+    }
+
     const valid = await bcrypt.compare(password, user.password);
-    if (!valid) throw new Error("Contraseña incorrecta");
-    return jwt.sign({ id: user.id, correo: user.correo }, SECRET, { expiresIn: "1d" });
+    if (!valid) {
+      throw new Error("Contraseña incorrecta");
+    }
+
+    return jwt.sign({ correo: user.correo }, SECRET as string, { expiresIn: "1h" });
   }
 
   async getAll(): Promise<UserDomain[]> {
     return this.repo.findAll();
   }
 
-  async getById(id: number): Promise<UserDomain | null> {
-    return this.repo.findById(id);
+  async getById(id: number): Promise<UserDomain> {
+    const user = await this.repo.findById(id);
+    if (!user) {
+      throw new Error("Usuario no encontrado");
+    }
+    return user;
   }
 
-  async update(id: number, data: UpdateUserDomain): Promise<UserDomain> {
-    const exists = await this.repo.findById(id);
-    if (!exists) throw new Error("Usuario no encontrado");
-    if (data.password) {
-      data.password = await bcrypt.hash(data.password, 10);
+  async update(id: number, user: UpdateUserDomain): Promise<UserDomain> {
+    if (user.password) {
+      user.password = await bcrypt.hash(user.password, 10);
     }
-    return this.repo.update(id, data);
+    return this.repo.update(id, user);
   }
 
 async delete(id: number): Promise<void> {
-  const exists = await this.repo.findById(id);
-  if (!exists) throw new Error("Usuario no encontrado");
-  await this.repo.delete(id); 
-}
+    await this.repo.delete(id);
+  }
 }

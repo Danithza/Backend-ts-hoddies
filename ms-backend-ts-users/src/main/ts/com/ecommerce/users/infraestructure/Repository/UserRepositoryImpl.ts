@@ -1,4 +1,4 @@
-import { AppDataSource } from "../config/database"; // 👈 IMPORTANTE: ahora viene de afuera
+import { AppDataSource } from "../config/database"; 
 import { UserEntity } from "../Entity/UserEntity";
 import { IUserRepository } from "./IUserRepository";
 import { UserMapper } from "../Mapper/UserMapper";
@@ -44,7 +44,7 @@ export class UserRepositoryImpl implements IUserRepository {
   async update(id: number, data: UpdateUserDomain): Promise<UserDomain> {
     const repo = AppDataSource.getRepository(UserEntity);
 
-    await repo.update({ id_usuario: id }, data as any);
+    await repo.update({ id_usuario: id }, data as Partial<UserEntity>);
 
     const updated = await repo.findOneBy({ id_usuario: id });
 

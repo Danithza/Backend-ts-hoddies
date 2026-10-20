@@ -1,7 +1,16 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import "dotenv/config";
 
-const SECRET = "SUPER_SECRET";
+const SECRET = process.env.JWT_SECRET;
+
+if (!SECRET) {
+  throw new Error("JWT_SECRET no está configurado en las variables de entorno");
+}
+
+export interface AuthenticatedRequest extends Request {
+  user?: string | jwt.JwtPayload;
+}
 
 export class JwtMiddleware {
   static verifyToken(req: Request, res: Response, next: NextFunction): void {
@@ -15,12 +24,12 @@ export class JwtMiddleware {
     try {
       const token = authHeader.replace("Bearer ", "");
 
-      const decoded = jwt.verify(token, SECRET, {
-        algorithms: ["HS256"]
+      // Forzamos el tipo a 'string' porque la comprobación if (!SECRET) superior ya asegura su existencia
+      const decoded = jwt.verify(token, SECRET as string, {
+        algorithms: ["HS256"],
       });
 
-      // 🔥 AQUÍ ESTÁ LO QUE TE FALTABA
-      (req as any).user = decoded;
+      (req as AuthenticatedRequest).user = decoded;
 
       next();
     } catch {

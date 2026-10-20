@@ -1,15 +1,16 @@
-import { Request, Response, NextFunction } from "express";
+import tseslint from 'typescript-eslint';
 
-export function GlobalExceptionHandler(
-  err: Error,
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void {
-
-  console.error("ERROR:", err.message);
-
-  res.status(500).json({
-    message: err.message || "Error interno del servidor"
-  });
-}
+export default tseslint.config(
+  {
+    // Ignorar archivos compilados y reportes
+    ignores: ["dist/**", "coverage/**", "node_modules/**"]
+  },
+  ...tseslint.configs.recommended,
+  {
+    files: ["src/**/*.ts"],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "error",
+      "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }]
+    }
+  }
+);

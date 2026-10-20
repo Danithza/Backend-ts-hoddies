@@ -6,7 +6,10 @@
   "scripts": {
     "build": "tsc",
     "dev": "serverless offline",
-    "start:local": "ts-node-dev src/main/ts/com/ecommerce/users/lambda/localServer.ts"
+    "start:local": "ts-node-dev src/main/ts/com/ecommerce/users/lambda/localServer.ts",
+    "lint": "eslint .",
+    "test": "jest --detectOpenHandles --forceExit",
+    "test:coverage": "jest --coverage --detectOpenHandles --forceExit"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -22,11 +25,25 @@
     "@types/bcrypt": "^6.0.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.72.0",
+    "@typescript-eslint/parser": "^8.72.0",
+    "eslint": "^10.13.0",
+    "jest": "^29.7.0",
     "serverless": "^4.34.0",
     "serverless-offline": "^14.5.0",
+    "ts-jest": "^29.1.2",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.0"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    }
   }
 }
